@@ -153,7 +153,7 @@ const RouteEditor: React.FC = () => {
       initMap();
     } else {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyD3NC9OPj4oVQnK4FxvjmJmYHXLp8zy-M4&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB7W5khIwaVuZDmQg5ebdTvd3PEHv0ALbs&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = initMap;
