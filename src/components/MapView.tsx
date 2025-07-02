@@ -1,38 +1,45 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation, AlertTriangle } from 'lucide-react';
 
+
+// SRP: Separar datos y lógica de mapa
+interface Vehicle {
+  id: string;
+  lat: number;
+  lng: number;
+  status: 'En ruta' | 'Recogiendo' | 'Retornando';
+  progress: number;
+}
+
+const VEHICLES: Vehicle[] = [
+  { id: 'V-024', lat: 39.4699, lng: -0.3763, status: 'En ruta', progress: 65 },
+  { id: 'V-031', lat: 39.4669, lng: -0.3808, status: 'Recogiendo', progress: 40 },
+  { id: 'V-018', lat: 39.4759, lng: -0.3820, status: 'Retornando', progress: 90 },
+  { id: 'V-012', lat: 39.4620, lng: -0.3740, status: 'En ruta', progress: 25 },
+];
+
 const MapView: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  
-  const vehicleData = [
-    { id: 'V-024', lat: 39.4699, lng: -0.3763, status: 'En ruta', progress: 65 },
-    { id: 'V-031', lat: 39.4669, lng: -0.3808, status: 'Recogiendo', progress: 40 },
-    { id: 'V-018', lat: 39.4759, lng: -0.3820, status: 'Retornando', progress: 90 },
-    { id: 'V-012', lat: 39.4620, lng: -0.3740, status: 'En ruta', progress: 25 }
-  ];
 
-  useEffect(() => {
+  React.useEffect(() => {
     const initMap = () => {
       if (!window.google || !mapRef.current) return;
-
       const map = new window.google.maps.Map(mapRef.current, {
-        center: { lat: 39.4699, lng: -0.3763 }, // Valencia center
+        center: { lat: 39.4699, lng: -0.3763 },
         zoom: 13,
         styles: [
           {
             featureType: 'poi',
             elementType: 'labels',
-            stylers: [{ visibility: 'off' }]
-          }
-        ]
+            stylers: [{ visibility: 'off' }],
+          },
+        ],
       });
-
-      // Add vehicle markers
-      vehicleData.forEach(vehicle => {
+      VEHICLES.forEach(vehicle => {
         const marker = new window.google.maps.Marker({
           position: { lat: vehicle.lat, lng: vehicle.lng },
-          map: map,
+          map,
           title: vehicle.id,
           icon: {
             url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
@@ -41,10 +48,9 @@ const MapView: React.FC = () => {
                 <path d="M12 16h8m-4-4v8" stroke="white" stroke-width="2" stroke-linecap="round"/>
               </svg>
             `),
-            scaledSize: new window.google.maps.Size(32, 32)
-          }
+            scaledSize: new window.google.maps.Size(32, 32),
+          },
         });
-
         const infoWindow = new window.google.maps.InfoWindow({
           content: `
             <div class="p-2">
@@ -52,17 +58,14 @@ const MapView: React.FC = () => {
               <p class="text-sm text-slate-600">Estado: ${vehicle.status}</p>
               <p class="text-sm text-slate-600">Progreso: ${vehicle.progress}%</p>
             </div>
-          `
+          `,
         });
-
         marker.addListener('click', () => {
           infoWindow.open(map, marker);
         });
       });
-
       setMapLoaded(true);
     };
-
     if (window.google) {
       initMap();
     } else {
@@ -90,9 +93,8 @@ const MapView: React.FC = () => {
             </button>
           </div>
         </div>
-        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          {vehicleData.map(vehicle => (
+          {VEHICLES.map(vehicle => (
             <div key={vehicle.id} className="bg-slate-50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium text-slate-800">{vehicle.id}</h4>
@@ -104,7 +106,7 @@ const MapView: React.FC = () => {
               </div>
               <p className="text-sm text-slate-600 mb-2">{vehicle.status}</p>
               <div className="w-full bg-slate-200 rounded-full h-2">
-                <div 
+                <div
                   className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${vehicle.progress}%` }}
                 ></div>
@@ -114,7 +116,6 @@ const MapView: React.FC = () => {
           ))}
         </div>
       </div>
-
       {/* Map Container */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="relative w-full h-96" style={{ minHeight: '400px' }}>
@@ -126,13 +127,12 @@ const MapView: React.FC = () => {
               </div>
             </div>
           )}
-          <div 
-            ref={mapRef} 
+          <div
+            ref={mapRef}
             className="w-full h-full"
           />
         </div>
       </div>
-
       {/* Legend */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h4 className="font-medium text-slate-800 mb-4">Leyenda del Mapa</h4>
